@@ -68,6 +68,8 @@ int main(int argc, char* argv[]) {
 				"document",
 				"document/id",
 				account_info));
+		conn->setDebug(true);
+		conn->setSocketTimeouts(10, 60, 180);
 		TestSuite(*conn).run();
 
 		result = EXIT_SUCCESS;

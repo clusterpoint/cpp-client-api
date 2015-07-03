@@ -56,9 +56,9 @@ void BasicIOTest::test_insert_many_documents_and_delete_them() {
 
 	// Generate a list of documents
 	std::vector<std::string> docs_vector;
-	docs_vector.reserve(100);
+	docs_vector.reserve(10);
 	int doc_count = 0;
-	std::generate_n(std::back_inserter(docs_vector), 100, [&doc_count]() {
+	std::generate_n(std::back_inserter(docs_vector), 10, [&doc_count]() {
 		std::string doc(doc_template);
 		doc.replace(
 				doc.find(id_placeholder),
@@ -130,9 +130,9 @@ void BasicIOTest::test_insert_many_documents_update_them_and_then_delete_them() 
 
 	// Generate a list of documents
 	std::vector<std::string> docs_vector;
-	docs_vector.reserve(100);
+	docs_vector.reserve(10);
 	int doc_count = 0;
-	std::generate_n(std::back_inserter(docs_vector), 100, [&doc_count]() {
+	std::generate_n(std::back_inserter(docs_vector), 10, [&doc_count]() {
 		std::string doc(doc_template);
 		doc.replace(
 				doc.find(id_placeholder),
@@ -224,9 +224,9 @@ void BasicIOTest::test_insert_many_documents_retrieve_them_and_then_delete_them(
 
 	// Generate a list of documents
 	std::vector<std::string> docs_vector;
-	docs_vector.reserve(100);
+	docs_vector.reserve(10);
 	int doc_count = 0;
-	std::generate_n(std::back_inserter(docs_vector), 100, [&doc_count]() {
+	std::generate_n(std::back_inserter(docs_vector), 10, [&doc_count]() {
 		std::string doc(doc_template);
 		doc.replace(
 				doc.find(id_placeholder),
@@ -320,9 +320,9 @@ void BasicIOTest::test_insert_many_documents_partially_replace_them_retrieve_the
 
 	// Generate a list of documents
 	std::vector<std::string> docs_vector;
-	docs_vector.reserve(100);
+	docs_vector.reserve(10);
 	int doc_count = 0;
-	std::generate_n(std::back_inserter(docs_vector), 100, [&doc_count]() {
+	std::generate_n(std::back_inserter(docs_vector), 10, [&doc_count]() {
 		std::string doc(doc_template);
 		doc.replace(
 				doc.find(id_placeholder),
@@ -389,9 +389,9 @@ void BasicIOTest::test_insert_many_documents_list_paths_and_delete_them() {
 
 	// Generate a list of documents
 	std::vector<std::string> docs_vector;
-	docs_vector.reserve(100);
+	docs_vector.reserve(10);
 	int doc_count = 0;
-	std::generate_n(std::back_inserter(docs_vector), 100, [&doc_count]() {
+	std::generate_n(std::back_inserter(docs_vector), 10, [&doc_count]() {
 		std::string doc(doc_template);
 		doc.replace(
 				doc.find(id_placeholder),

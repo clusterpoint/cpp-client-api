@@ -29,7 +29,9 @@ private:
 #define RUN_TEST(test_name) \
 	do { \
 		std::cout << "***** " << RUN_TEST_XNAME(test_name) << " *****" << std::endl; \
+		set_up(); \
 		test_name (); \
+		tear_down(); \
 		std::cout << std::endl; \
 	} while (0)
 

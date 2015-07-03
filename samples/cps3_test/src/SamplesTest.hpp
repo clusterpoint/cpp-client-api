@@ -11,6 +11,8 @@ public:
 	SamplesTest(CPS::Connection& connection);
 
 protected:
+	virtual void set_up();
+	virtual void tear_down();
 	virtual void run_tests();
 
 private:
@@ -27,8 +29,6 @@ private:
 	void test_status_sample();
 	void test_clear_sample();
 	void test_reindex_sample();
-
-	void clear();
 };
 
 #endif /* SAMPLESTEST_HPP_ */
