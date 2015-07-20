@@ -5,13 +5,14 @@
 #include <iostream>
 
 TestSuite::TestSuite(CPS::Connection& connection)
-	: connection_(connection)
+  : connection_(connection)
 {
 }
 
-void TestSuite::run() {
-	BasicIOTest(connection_).run();
-	SamplesTest(connection_).run();
+void TestSuite::run()
+{
+  BasicIOTest(connection_).run();
+  SamplesTest(connection_).run();
 
-	std::cout << "*** ALL TESTS PASSED ***" << std::endl;
+  std::cout << "*** ALL TESTS PASSED ***" << std::endl;
 }

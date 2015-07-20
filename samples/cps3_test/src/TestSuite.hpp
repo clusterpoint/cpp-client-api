@@ -8,12 +8,12 @@
 class TestSuite
 {
 public:
-	TestSuite(CPS::Connection& connection);
+  TestSuite(CPS::Connection& connection);
 
-	void run();
+  void run();
 
 private:
-	CPS::Connection& connection_;
+  CPS::Connection& connection_;
 };
 
 #endif /* TESTSUITE_HPP_ */
