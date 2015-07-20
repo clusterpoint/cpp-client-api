@@ -20,7 +20,7 @@ void SamplesTest::run_tests()
 {
   RUN_TEST(test_insert_sample);
   RUN_TEST(test_update_sample);
-  RUN_TEST(test_reindex_sample);
+  //RUN_TEST(test_reindex_sample);
   RUN_TEST(test_replace_sample);
   RUN_TEST(test_partial_replace_sample);
   RUN_TEST(test_delete_sample);
@@ -30,30 +30,7 @@ void SamplesTest::run_tests()
   RUN_TEST(test_list_last_sample);
   RUN_TEST(test_list_paths_sample);
   RUN_TEST(test_status_sample);
-  RUN_TEST(test_clear_sample);
-
-  connection().setDebug(false);
-  // Clear command deletes database. It may take some time until a new
-  // database is created. So, commands will return errors for a while.
-  // We will use Search command to find out, when the database is ready
-  // to receive any further commands.
-  for (int i = 0; i < 120; i += 1)
-  {
-    try
-    {
-      std::unique_ptr<CPS::SearchResponse> search_resp(
-          connection().sendRequest<CPS::SearchResponse>(CPS::SearchRequest("*")));
-      if (!search_resp->hasFailed() && search_resp->getFound() == 0)
-      {
-        break;
-      }
-    }
-    catch (CPS::Exception& e)
-    {
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-  }
-  connection().setDebug(true);
+  //RUN_TEST(test_clear_sample);
 }
 
 void SamplesTest::test_insert_sample()

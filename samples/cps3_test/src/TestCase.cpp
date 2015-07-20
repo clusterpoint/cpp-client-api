@@ -1,4 +1,5 @@
 #include "TestCase.hpp"
+#include "Utils.hpp"
 
 #include <cassert>
 #include <chrono>
@@ -29,31 +30,17 @@ void TestCase::set_up()
   connection().setDebug(false);
   std::unique_ptr<CPS::SearchResponse> search_resp(
       connection().sendRequest<CPS::SearchResponse>(CPS::SearchRequest("*")));
-  if (!search_resp->hasFailed() && search_resp->getFound() != 0)
+  while (!search_resp->hasFailed() && search_resp->getFound() != 0)
   {
-    std::unique_ptr<CPS::Response> resp(
-        connection().sendRequest<CPS::Response>(CPS::Request("clear")));
-    assert(!resp->hasFailed());
-    // Clear command deletes database. It may take some time until a new
-    // database is created. So, commands will return errors for a while.
-    // We will use Search command to find out, when the database is ready
-    // to receive any further commands.
-    for (int i = 0; i < 120; i += 1)
-    {
-      std::this_thread::sleep_for(std::chrono::seconds(3));
-      try
-      {
-        std::unique_ptr<CPS::SearchResponse> search_resp(
-            connection().sendRequest<CPS::SearchResponse>(CPS::SearchRequest("*")));
-        if (!search_resp->hasFailed() && search_resp->getFound() == 0)
-        {
-          break;
-        }
-      }
-      catch (CPS::Exception& e)
-      {
-      }
-    }
+    // Delete found documents
+    auto docs = search_resp->getDocumentsXML();
+    std::vector<std::string> doc_ids;
+    doc_ids.reserve(docs.size());
+    std::transform(docs.begin(), docs.end(), std::back_inserter(doc_ids), &get_docid);
+    CPS::DeleteRequest delete_req(doc_ids);
+    std::unique_ptr<CPS::DeleteResponse> delete_resp(
+        connection().sendRequest<CPS::DeleteResponse>(delete_req));
+    search_resp.reset(connection().sendRequest<CPS::SearchResponse>(CPS::SearchRequest("*")));
   }
   connection().setDebug(true);
 }

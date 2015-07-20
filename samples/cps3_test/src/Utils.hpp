@@ -30,4 +30,14 @@ inline std::string make_docid(const std::string& prefix, int id)
   return docid;
 }
 
+inline std::string get_docid(CPS::XMLDocument* xmldoc)
+{
+  auto nodes = xmldoc->FindFast("/document/id", false);
+  if (nodes.empty())
+  {
+    throw std::runtime_error("Document without Id");
+  }
+  return nodes.front()->getContent();
+}
+
 #endif /* UTILS_HPP_ */
