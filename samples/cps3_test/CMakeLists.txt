@@ -15,6 +15,8 @@ set(CPS3_SRCS
 	src/BasicIOTest.hpp
 	src/BasicIOTest.cpp
 	src/main.cpp
+	src/PerformanceTest.hpp
+	src/PerformanceTest.cpp
 	src/SamplesTest.hpp
 	src/SamplesTest.cpp
 	src/TestCase.hpp

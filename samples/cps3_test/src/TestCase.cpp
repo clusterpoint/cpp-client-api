@@ -30,8 +30,16 @@ void TestCase::set_up()
   connection().setDebug(false);
   std::unique_ptr<CPS::SearchResponse> search_resp(
       connection().sendRequest<CPS::SearchResponse>(CPS::SearchRequest("*")));
+  bool first_time = true;
   while (!search_resp->hasFailed() && search_resp->getFound() != 0)
   {
+    if (first_time)
+    {
+      std::cout << "Clearing DB";
+      first_time = false;
+    }
+    std::cout << ".";
+    std::cout.flush();
     // Delete found documents
     auto docs = search_resp->getDocumentsXML();
     std::vector<std::string> doc_ids;
@@ -41,6 +49,10 @@ void TestCase::set_up()
     std::unique_ptr<CPS::DeleteResponse> delete_resp(
         connection().sendRequest<CPS::DeleteResponse>(delete_req));
     search_resp.reset(connection().sendRequest<CPS::SearchResponse>(CPS::SearchRequest("*")));
+  }
+  if (!first_time)
+  {
+    std::cout << std::endl;
   }
   connection().setDebug(true);
 }
