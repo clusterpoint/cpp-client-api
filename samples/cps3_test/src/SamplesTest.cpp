@@ -396,21 +396,40 @@ void SamplesTest::test_aggregation_sample()
   int offset = 0;
   // return not more than 5 documents
   int docs = 5;
+  // return these fields from the documents
+  std::map<std::string, std::string> fields;
+  fields["id"] = "yes";
+  fields["car_params/make"] = "yes";
+  fields["car_params/model"] = "yes";
+  fields["car_params/year"] = "yes";
 
-  CPS::SearchRequest search_req("*", offset, docs);
-  search_req.setParam("aggregate", "category, count(category) as cnt group by category");
+  CPS::SearchRequest search_req("*", offset, docs, fields);
+  search_req.setAggregate("category, count(category) as cnt group by category");
+  search_req.setAggregate("model, count(model) as cnt group by model");
   std::unique_ptr<CPS::SearchResponse> search_resp(conn->sendRequest<CPS::SearchResponse>(search_req));
 
-  // TODO: no C++ API for aggregations
-  if (search_resp->getHits() > 0)
-  {
-    std::cout << "Found: " << search_resp->getHits() << std::endl;
-    // Get list of documents as strings You can parse with your chosen XML parser
-    std::vector<std::string> docStrings = search_resp->getDocumentsString();
+  // Get a map of aggregates where key is query for aggregate and value as object of type SearchAggregate.
+  std::map<std::string, CPS::SearchAggregate> aggregates = search_resp->getAggregates();
+  assert(!aggregates.empty());
 
-    // Or get list of documents as XMLDocuments,
-    // which is a custom XML class using RapidXML as parser
-    std::vector<CPS::XMLDocument*> docXML = search_resp->getDocumentsXML();
+  // Print out aggregates.
+  for (auto aggregate : aggregates)
+  {
+    std::cout << "Aggregates for " << aggregate.first << std::endl;
+    for (auto result : aggregate.second.data)
+    {
+      bool first_key_value = true;
+      for (auto key_value : result)
+      {
+        if (!first_key_value)
+          std::cout << ", ";
+        else
+          first_key_value = false;
+        std::cout << key_value.first << "=" << key_value.second;
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
   }
 }
 
@@ -470,37 +489,25 @@ void SamplesTest::test_faceted_search_sample()
   search_req.setOrdering(ordering);
   std::unique_ptr<CPS::SearchResponse> search_resp(conn->sendRequest<CPS::SearchResponse>(search_req));
 
-  if (search_resp->getHits() > 0)
-  {
-    std::cout << "Found: " << search_resp->getHits() << std::endl;
-    // Get list of documents as strings You can parse with your chosen XML parser
-    std::vector<std::string> docStrings = search_resp->getDocumentsString();
-
-    // Or get list of documents as XMLDocuments,
-    // which is a custom XML class using RapidXML as parser
-    std::vector<CPS::XMLDocument*> docXML = search_resp->getDocumentsXML();
-  }
-
-  // Get a map of facets, where key is a facet Xpath and value is a SearchFacet
-  // structure containing a list of Terms and Hit Count for each term.
+  // Get a map of facets, where key is a facet's Xpath and value is a SearchFacet
+  // structure containing a list of Terms and Hit Count of each term.
   std::map<std::string, CPS::SearchFacet> facets = search_resp->getFacets();
-  if (facets.count(facet_path) > 0)
+  assert(facets.count(facet_path) > 0);
+
+  // Print out facet terms and hit counts.
+  for (auto &facet : facets)
   {
-    // Print out facet terms and hit counts.
-    for (auto &facet : facets)
+    std::cout << "Facet " << facet.first << ": ";
+    bool first_term = true;
+    for (auto &term : facet.second.terms)
     {
-      std::cout << "Facet " << facet.first << ": ";
-      bool first_term = true;
-      for (auto &term : facet.second.terms)
-      {
-        if (!first_term)
-          std::cout << ", ";
-        else
-          first_term = false;
-        std::cout << term.name << " (" << term.hits << ")";
-      }
-      std::cout << std::endl;
+      if (!first_term)
+        std::cout << ", ";
+      else
+        first_term = false;
+      std::cout << term.name << " (" << term.hits << ")";
     }
+    std::cout << std::endl;
   }
 }
 
