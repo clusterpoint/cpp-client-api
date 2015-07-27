@@ -103,7 +103,7 @@ public:
     map<string, SearchFacet> getFacets() {
         if (!_facets.empty())
             return _facets;
-        NodeSet ns = doc->FindFast("facet", true);
+        NodeSet ns = doc->FindFast("cps:reply/cps:content/facet", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
             list<Node *> terms = ns[i]->getChildren("term");
             SearchFacet facet(ns[i]->getAttribute("path")->getValue());
