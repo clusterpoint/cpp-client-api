@@ -51,6 +51,22 @@ public:
     vector<Term> terms;
 };
 
+class SearchAggregate
+{
+public:
+    /** @param query The query of the aggregate */
+    SearchAggregate(const string &query = "") {
+        this->query = query;
+    }
+    virtual ~SearchAggregate() {
+    }
+
+    /** Aggregate query */
+    string query;
+    /** Vector of aggregate results */
+    vector<map<string, string> > data;
+};
+
 class SearchResponse: public Response
 {
 public:
@@ -119,6 +135,34 @@ public:
     }
 
     /**
+     * Returns the map of aggregates where key is query for aggregate and value as object of type SearchAggregate
+     */
+    map<string, SearchAggregate> getAggregates() {
+        if (!_aggregates.empty())
+            return _aggregates;
+        NodeSet ns = doc->FindFast("cps:reply/cps:content/aggregate", true);
+        for (unsigned int i = 0; i < ns.size(); i++) {
+            list<Node *> query = ns[i]->getChildren("query");
+            list<Node *> data = ns[i]->getChildren("data");
+            if (query.empty() || data.empty())
+                continue;
+            SearchAggregate aggregate(query.front()->getValue());
+            for (list<Node *>::iterator it = data.begin(); it != data.end();
+                    it++) {
+                map<string, string> fields;
+                Node *child = (*it)->getFirstChild();
+                while (child) {
+                    fields[child->getName()] = child->getValue();
+                    child = child->getNextSibling();
+                }
+                aggregate.data.push_back(fields);
+            }
+            _aggregates[aggregate.query] = aggregate;
+        }
+        return _aggregates;
+    }
+
+    /**
      * Returns the documents from the response as vector of documents represented as strings
      * @param documentTagName string that identifies root of document
      * @param formatted boolean, true if document should be formatted with spaces for better readability
@@ -152,7 +196,9 @@ private:
     vector<string> _documentsString;
     vector<XMLDocument*> _documentsXML;
     map<string, SearchFacet> _facets;
+    map<string, SearchAggregate> _aggregates;
 };
+
 }
 
 #endif /* CPS_SEARCHRESPONSE_HPP */

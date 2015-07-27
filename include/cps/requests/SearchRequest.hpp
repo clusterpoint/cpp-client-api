@@ -90,6 +90,22 @@ public:
     }
 
     /**
+     * Sets aggregate functions
+     * @param aggregate The aggregate function
+     */
+    void setAggregate(const string &aggregate) {
+        this->setAggregate(vector < string > (1, aggregate));
+    }
+
+    /**
+     * Sets aggregate functions
+     * @param aggregates The list of aggregate functions
+     */
+    void setAggregate(const vector<string> &aggregates) {
+        this->setParam("aggregate", aggregates);
+    }
+
+    /**
      * Sets the stemming language
      * @param stemLang 2-letter language ID
      */
