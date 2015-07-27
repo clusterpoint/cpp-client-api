@@ -51,7 +51,7 @@
   </rule>
   <rule>
     <xpath>//document/car_params</xpath>
-    <property>index=xml</property>
+    <property>index=xml&amp;facet</property>
     <property>index-numbers=no</property>
     <property>index-dates=no</property>
     <property>index-empty=no</property>

@@ -21,7 +21,8 @@ private:
   void test_partial_replace_sample();
   void test_delete_sample();
   void test_search_sample();
-  void test_search_with_aggregate_sample();
+  void test_aggregation_sample();
+  void test_faceted_search_sample();
   void test_lookup_sample();
   void test_retrieve_sample();
   void test_list_last_sample();

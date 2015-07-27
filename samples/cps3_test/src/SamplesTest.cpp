@@ -25,7 +25,8 @@ void SamplesTest::run_tests()
   RUN_TEST(test_partial_replace_sample);
   RUN_TEST(test_delete_sample);
   RUN_TEST(test_search_sample);
-  RUN_TEST(test_search_with_aggregate_sample);
+  RUN_TEST(test_aggregation_sample);
+  RUN_TEST(test_faceted_search_sample);
   RUN_TEST(test_lookup_sample);
   RUN_TEST(test_retrieve_sample);
   RUN_TEST(test_list_last_sample);
@@ -354,7 +355,7 @@ void SamplesTest::test_search_sample()
   }
 }
 
-void SamplesTest::test_search_with_aggregate_sample()
+void SamplesTest::test_aggregation_sample()
 {
   CPS::Connection *conn = &connection();
 
@@ -410,6 +411,96 @@ void SamplesTest::test_search_with_aggregate_sample()
     // Or get list of documents as XMLDocuments,
     // which is a custom XML class using RapidXML as parser
     std::vector<CPS::XMLDocument*> docXML = search_resp->getDocumentsXML();
+  }
+}
+
+void SamplesTest::test_faceted_search_sample()
+{
+  CPS::Connection *conn = &connection();
+
+  // There are four ways documents can be passed:
+  // 1) document id and document body -> CPS::InsertRequest(string, string)
+  // 2) document string with id included* -> CPS::InsertRequest(string)
+  // 3) vector of documents with ids included* -> CPS::InsertRequest(vector<string>)
+  // 3) map of documents with key as id and value as document body -> CPS::InsertRequest(map<string, string>)
+  // * If policy includes autoincremented id then id can be skipped.
+
+  // Inserting test documents. The same approach could be used also for update/replace/partial-replace commands
+  std::vector<std::string> docs_vector;
+  docs_vector.push_back(
+      "<document><id>id1</id><category>cars</category><car_params><make>Ford</make><model>Mustang</model><year>2012</year></car_params></document>");
+  docs_vector.push_back(
+      "<document><id>id2</id><category>cars</category><car_params><make>Dodge</make><model>Viper</model><year>2014</year></car_params></document>");
+  std::map<std::string, std::string> docs_map;
+  docs_map["id3"] =
+      "<category>cars</category><car_params><make>Lamborghini</make><model>Diablo</model><year>2010</year></car_params>";
+  docs_map["id4"] =
+      "<category>cars</category><car_params><make>Ferrary</make><model>Testarossa</model><year>1986</year></car_params>";
+
+  // When creating modify requests documents must be passed to constructor
+  CPS::InsertRequest insert_req(docs_vector);
+  // More documents can also be added after insert request object is created
+  // More document adding allows previously mentioned types
+  insert_req.setDocuments(docs_map);
+  insert_req.setDocument(
+      "<document><id>id5</id><category>cars</category><car_params><make>McLaren</make><model>F1</model><year>2010</year></car_params></document>");
+  insert_req.setDocument(
+      "id6",
+      "<category>cars</category><car_params><make>Volkswagen</make><model>Beetle</model><year>1968</year></car_params>");
+
+  std::unique_ptr<CPS::InsertResponse> insert_resp(conn->sendRequest<CPS::InsertResponse>(insert_req));
+
+  // Setting parameters
+  // search for items with category == "cars"
+  std::string query = "<category>cars</category>";
+
+  // return documents starting with the first one - offset 0
+  int offset = 0;
+  // return not more than 5 documents
+  int docs = 5;
+
+  // retrieve car counts by make
+  std::string facet_path = "car_params/make";
+
+  // order by year, from largest to smallest
+  std::string ordering = CPS::Ordering::NumericOrdering("car_params/year", CPS::Ordering::Descending);
+
+  CPS::SearchRequest search_req(query, offset, docs);
+  search_req.setFacet(facet_path);
+  search_req.setOrdering(ordering);
+  std::unique_ptr<CPS::SearchResponse> search_resp(conn->sendRequest<CPS::SearchResponse>(search_req));
+
+  if (search_resp->getHits() > 0)
+  {
+    std::cout << "Found: " << search_resp->getHits() << std::endl;
+    // Get list of documents as strings You can parse with your chosen XML parser
+    std::vector<std::string> docStrings = search_resp->getDocumentsString();
+
+    // Or get list of documents as XMLDocuments,
+    // which is a custom XML class using RapidXML as parser
+    std::vector<CPS::XMLDocument*> docXML = search_resp->getDocumentsXML();
+  }
+
+  // Get a map of facets, where key is a facet Xpath and value is a SearchFacet
+  // structure containing a list of Terms and Hit Count for each term.
+  std::map<std::string, CPS::SearchFacet> facets = search_resp->getFacets();
+  if (facets.count(facet_path) > 0)
+  {
+    // Print out facet terms and hit counts.
+    for (auto &facet : facets)
+    {
+      std::cout << "Facet " << facet.first << ": ";
+      bool first_term = true;
+      for (auto &term : facet.second.terms)
+      {
+        if (!first_term)
+          std::cout << ", ";
+        else
+          first_term = false;
+        std::cout << term.name << " (" << term.hits << ")";
+      }
+      std::cout << std::endl;
+    }
   }
 }
 
