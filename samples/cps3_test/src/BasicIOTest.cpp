@@ -481,21 +481,32 @@ void BasicIOTest::test_insert_two_documents_list_last_and_delete_them()
     return doc;
   });
   // Insert documents
-  CPS::InsertRequest insert_req(docs_vector);
-  std::unique_ptr<CPS::InsertResponse> insert_resp(
-      connection().sendRequest<CPS::InsertResponse>(insert_req));
-  auto inserted_ids = insert_resp->getModifiedIds();
-  std::sort(inserted_ids.begin(), inserted_ids.end());
-  std::cout << "Insert ids: " << CPS::Utils::join(inserted_ids) << std::endl;
-  assert(inserted_ids.size() == doc_count);
+  std::vector<std::string> inserted_ids;
+  inserted_ids.reserve(docs_vector.size());
+  for (auto &doc : docs_vector)
+  {
+    std::vector<std::string> docs_to_insert = { doc };
+    CPS::InsertRequest insert_req(docs_to_insert);
+    std::unique_ptr<CPS::InsertResponse> insert_resp(
+        connection().sendRequest<CPS::InsertResponse>(insert_req));
+    auto inserted_id = insert_resp->getModifiedIds();
+    std::cout << "Insert id: " << inserted_id[0] << std::endl;
+    assert(inserted_id.size() == 1);
+    inserted_ids.push_back(inserted_id[0]);
+  }
   // List last
-  CPS::ListLastRequest list_last_req(0, 1);
+  // return these fields from the documents
+  std::map<std::string, std::string> fields;
+  fields["/document/id"] = "yes";
+  fields["/document/title"] = "yes";
+  fields["/document/body"] = "yes";
+  CPS::ListLastRequest list_last_req(0, 1, fields);
   std::unique_ptr<CPS::ListLastResponse> list_last_resp(
       connection().sendRequest<CPS::ListLastResponse>(list_last_req));
   auto last_docs = list_last_resp->getDocumentsString();
   assert(last_docs.size() == 1);
   std::cout << "Last doc: " << last_docs[0] << std::endl;
-  assert(last_docs[0] == docs_vector[1]);
+  assert(last_docs[0] == docs_vector.back());
   // Delete documents
   CPS::DeleteRequest delete_req(inserted_ids);
   std::unique_ptr<CPS::DeleteResponse> delete_resp(
@@ -507,6 +518,7 @@ void BasicIOTest::test_insert_two_documents_list_last_and_delete_them()
   std::sort(deleted_ids.begin(), deleted_ids.end());
   std::cout << "Delete ids: " << CPS::Utils::join(deleted_ids) << std::endl;
   assert(deleted_ids.size() == doc_count);
+  std::sort(inserted_ids.begin(), inserted_ids.end());
   auto delete_mismatch = std::mismatch(inserted_ids.begin(), inserted_ids.end(), deleted_ids.begin());
   assert(delete_mismatch.first == inserted_ids.end());
   assert(delete_mismatch.second == deleted_ids.end());
@@ -543,8 +555,8 @@ void BasicIOTest::test_insert_two_documents_lookup_last_and_delete_them()
   std::vector<std::string> lookup_ids;
   lookup_ids.push_back(inserted_ids[1]);
   std::map<std::string, std::string> paths;
-  paths["document/id"] = "yes";
-  paths["document/title"] = "yes";
+  paths["/document/id"] = "yes";
+  paths["/document/title"] = "yes";
   CPS::LookupRequest lookup_req(lookup_ids, paths);
   std::unique_ptr<CPS::LookupResponse> lookup_resp(
       connection().sendRequest<CPS::LookupResponse>(lookup_req));
@@ -600,10 +612,10 @@ void BasicIOTest::test_insert_many_documents_search_and_delete_them()
   assert(inserted_ids.size() == doc_count);
   // Search documents by title
   std::string query = "<title>Test document 1</title>";
-  std::map<std::string, std::string> paths;
-  paths["document/id"] = "yes";
-  paths["document/title"] = "yes";
-  CPS::SearchRequest search_req(query, 0, 100, paths);
+  std::map<std::string, std::string> fields;
+  fields["/document/id"] = "yes";
+  fields["/document/title"] = "yes";
+  CPS::SearchRequest search_req(query, 0, 100, fields);
   std::unique_ptr<CPS::SearchResponse> search_resp(
       connection().sendRequest<CPS::SearchResponse>(search_req));
   std::cout << "Hits " << search_resp->getHits() << std::endl;

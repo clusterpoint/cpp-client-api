@@ -25,6 +25,7 @@ void SamplesTest::run_tests()
   RUN_TEST(test_partial_replace_sample);
   RUN_TEST(test_delete_sample);
   RUN_TEST(test_search_sample);
+  RUN_TEST(test_search_with_aggregate_sample);
   RUN_TEST(test_lookup_sample);
   RUN_TEST(test_retrieve_sample);
   RUN_TEST(test_list_last_sample);
@@ -302,9 +303,9 @@ void SamplesTest::test_search_sample()
       "<document><id>id2</id><category>cars</category><car_params><make>Dodge</make><model>Viper</model><year>2014</year></car_params></document>");
   std::map<std::string, std::string> docs_map;
   docs_map["id3"] =
-      "<document><id>id3</id><category>cars</category><car_params><make>Lamborghini</make><model>Diablo</model><year>2010</year></car_params></document>";
+      "<category>cars</category><car_params><make>Lamborghini</make><model>Diablo</model><year>2010</year></car_params>";
   docs_map["id4"] =
-      "<document><id>id4</id><category>cars</category><car_params><make>Ferrary</make><model>Testarossa</model><year>1986</year></car_params></document>";
+      "<category>cars</category><car_params><make>Ferrary</make><model>Testarossa</model><year>1986</year></car_params>";
 
   // When creating modify requests documents must be passed to constructor
   CPS::InsertRequest insert_req(docs_vector);
@@ -315,7 +316,7 @@ void SamplesTest::test_search_sample()
       "<document><id>id5</id><category>cars</category><car_params><make>McLaren</make><model>F1</model><year>2010</year></car_params></document>");
   insert_req.setDocument(
       "id6",
-      "<document><id>id6</id><category>cars</category><car_params><make>Volkswagen</make><model>Beetle</model><year>1968</year></car_params></document>");
+      "<category>cars</category><car_params><make>Volkswagen</make><model>Beetle</model><year>1968</year></car_params>");
 
   std::unique_ptr<CPS::InsertResponse> insert_resp(conn->sendRequest<CPS::InsertResponse>(insert_req));
 
@@ -335,12 +336,71 @@ void SamplesTest::test_search_sample()
   list["car_params/year"] = "yes";
 
   // order by year, from largest to smallest
-  string ordering = CPS::Ordering::NumericOrdering("car_params/year", CPS::Ordering::Descending);
+  std::string ordering = CPS::Ordering::NumericOrdering("car_params/year", CPS::Ordering::Descending);
 
   CPS::SearchRequest search_req(query, offset, docs, list);
   search_req.setOrdering(ordering);
   std::unique_ptr<CPS::SearchResponse> search_resp(conn->sendRequest<CPS::SearchResponse>(search_req));
 
+  if (search_resp->getHits() > 0)
+  {
+    std::cout << "Found: " << search_resp->getHits() << std::endl;
+    // Get list of documents as strings You can parse with your chosen XML parser
+    std::vector<std::string> docStrings = search_resp->getDocumentsString();
+
+    // Or get list of documents as XMLDocuments,
+    // which is a custom XML class using RapidXML as parser
+    std::vector<CPS::XMLDocument*> docXML = search_resp->getDocumentsXML();
+  }
+}
+
+void SamplesTest::test_search_with_aggregate_sample()
+{
+  CPS::Connection *conn = &connection();
+
+  // There are four ways documents can be passed:
+  // 1) document id and document body -> CPS::InsertRequest(string, string)
+  // 2) document string with id included* -> CPS::InsertRequest(string)
+  // 3) vector of documents with ids included* -> CPS::InsertRequest(vector<string>)
+  // 3) map of documents with key as id and value as document body -> CPS::InsertRequest(map<string, string>)
+  // * If policy includes autoincremented id then id can be skipped.
+
+  // Inserting test documents. The same approach could be used also for update/replace/partial-replace commands
+  std::vector<std::string> docs_vector;
+  docs_vector.push_back(
+      "<document><id>id1</id><category>cars</category><car_params><make>Ford</make><model>Mustang</model><year>2012</year></car_params></document>");
+  docs_vector.push_back(
+      "<document><id>id2</id><category>cars</category><car_params><make>Dodge</make><model>Viper</model><year>2014</year></car_params></document>");
+  std::map<std::string, std::string> docs_map;
+  docs_map["id3"] =
+      "<category>cars</category><car_params><make>Lamborghini</make><model>Diablo</model><year>2010</year></car_params>";
+  docs_map["id4"] =
+      "<category>cars</category><car_params><make>Ferrary</make><model>Testarossa</model><year>1986</year></car_params>";
+
+  // When creating modify requests documents must be passed to constructor
+  CPS::InsertRequest insert_req(docs_vector);
+  // More documents can also be added after insert request object is created
+  // More document adding allows previously mentioned types
+  insert_req.setDocuments(docs_map);
+  insert_req.setDocument(
+      "<document><id>id5</id><category>cars</category><car_params><make>McLaren</make><model>F1</model><year>2010</year></car_params></document>");
+  insert_req.setDocument(
+      "id6",
+      "<category>cars</category><car_params><make>Volkswagen</make><model>Beetle</model><year>1968</year></car_params>");
+
+  std::unique_ptr<CPS::InsertResponse> insert_resp(conn->sendRequest<CPS::InsertResponse>(insert_req));
+
+  // Setting parameters
+  // return documents starting with the first one - offset 0
+  int offset = 0;
+  // return not more than 5 documents
+  int docs = 5;
+
+  CPS::SearchRequest search_req("*", offset, docs);
+  search_req.setParam("aggregate", "category, count(category) as cnt group by category");
+  std::unique_ptr<CPS::SearchResponse> search_resp(conn->sendRequest<CPS::SearchResponse>(search_req));
+
+  // TODO: no C++ API for aggregations
   if (search_resp->getHits() > 0)
   {
     std::cout << "Found: " << search_resp->getHits() << std::endl;
