@@ -75,8 +75,8 @@ public:
             const map<string, vector<string> > &envelopeParams,
             bool createXML = false, long long transactionId = -1) const {
 
-        XMLDocument *doc;
-        Node *root, *content;
+        XMLDocument *doc = NULL;
+        Node *root = NULL, *content = NULL;
         string xml_as_string;
 
         if (createXML == true) {
@@ -97,7 +97,7 @@ public:
             }
         }
         // Add text fields
-        if (createXML == true) {
+        if (root) {
             content = root->addChild("content", "cps");
         } else {
             xml_as_string += "<cps:content>";
@@ -157,7 +157,7 @@ public:
             } else {
                 document = xmlUtilCreatePath(docRootXpath.c_str(), it->c_str());
             }
-            if (createXML == true) {
+            if (content) {
                 XMLDocument* fragment = XMLDocument::parseFromMemory(document);
                 content->importNode(fragment->getRootNode());
                 delete fragment;
@@ -166,7 +166,7 @@ public:
             }
         }
 
-        if (createXML == true) {
+        if (doc) {
             xml_as_string = doc->toString(true);
             delete doc;
         } else {
