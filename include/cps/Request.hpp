@@ -44,8 +44,8 @@ public:
         textParamNames = vector <string> (_textParamNames, _textParamNames + 44);
         sort(textParamNames.begin(), textParamNames.end());
 
-        string _rawParamNames[] = { "list", "query", "ordering" };
-        rawParamNames = vector < string > (_rawParamNames, _rawParamNames + 3);
+        string _rawParamNames[] = { "list", "query", "ordering", "shapes" };
+        rawParamNames = vector < string > (_rawParamNames, _rawParamNames + 4);
         sort(rawParamNames.begin(), rawParamNames.end());
     }
 
