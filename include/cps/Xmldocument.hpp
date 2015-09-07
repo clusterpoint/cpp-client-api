@@ -491,7 +491,11 @@ public:
         contents.push_back(0);
         char *xml_string = doc->allocate_string(contents.c_str(),
                                                 contents.size());
+#ifdef CPS_XMLDOCUMENT_HPP_PARSE_FULL
+        doc->parse<rapidxml::parse_full>(xml_string);
+#else // CPS_XMLDOCUMENT_HPP_PARSE_FULL
         doc->parse<0>(xml_string);
+#endif // CPS_XMLDOCUMENT_HPP_PARSE_FULL
         ret->pDoc = doc;
         return ret;
     }
