@@ -8,7 +8,7 @@
 
 #ifndef USE_HEADER_ONLY_ASIO
     #include "boost/asio.hpp"
-    using namespace boost;
+//    using namespace boost::asio;
 #else
     #define ASIO_DISABLE_THREADS // To disable linking errors
     #include "asio.hpp"
@@ -145,7 +145,7 @@ public:
             try {
                 socket->connect(this->host, this->port);
             } catch (std::exception &e) {
-                BOOST_THROW_EXCEPTION(CPS::Exception(string("Connection error - ") + e.what()));
+                BOOST_THROW_EXCEPTION(CPS::Exception(std::string("Connection error - ") + e.what()));
             }
         }
     }
@@ -156,7 +156,7 @@ public:
      * @param xml string
      */
     template<class ResponseType>
-    ResponseType *sendRequestRaw(string message) {
+    ResponseType *sendRequestRaw(std::string message) {
         if (this->debug)
             std::cout << "Request:\n" << message << std::endl;
 
@@ -200,7 +200,7 @@ public:
                 	this->transactionId = -1;
                 }
                 if (resp->getErrors().size() > 0 && resp->hasFailed()) {
-                	vector <Error> errors = resp->getErrors();
+                	std::vector <Error> errors = resp->getErrors();
                 	BOOST_THROW_EXCEPTION(CPS::Exception(errors[0].message, boost::lexical_cast<int>(errors[0].code), resp));
                 }
                 return resp;
@@ -209,7 +209,7 @@ public:
         	// Redirect valid exception up the chain
         	throw e;
         } catch (std::exception &e) {
-            BOOST_THROW_EXCEPTION(CPS::Exception(string("Error while sending - ") + e.what()));
+            BOOST_THROW_EXCEPTION(CPS::Exception(std::string("Error while sending - ") + e.what()));
         }
     }
 
@@ -217,7 +217,7 @@ public:
      * Sends the raw xml request and returns generic response
      * @see sendRequest(string message)
      */
-    Response *sendRequestRaw(string message) {
+    Response *sendRequestRaw(std::string message) {
         return sendRequestRaw<Response>(message);
     }
 
@@ -233,8 +233,8 @@ public:
     template<class ResponseType>
     ResponseType* sendRequest(const Request &request) {
         // Create request
-        std::map<string, vector<string> > envelopeParams;
-        for (std::map<string, string>::iterator it = this->customEnvelopeParams.begin(); it != this->customEnvelopeParams.end(); ++it) {
+        std::map<std::string, std::vector<std::string> > envelopeParams;
+        for (std::map<std::string, std::string>::iterator it = this->customEnvelopeParams.begin(); it != this->customEnvelopeParams.end(); ++it) {
         	envelopeParams[it->first].push_back(it->second);
         }
         envelopeParams["storage"].push_back(this->storageName);

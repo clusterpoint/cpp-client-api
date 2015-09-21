@@ -10,6 +10,8 @@
 #include "boost/bind.hpp"
 #include "boost/lambda/lambda.hpp"
 
+namespace CPS
+{
 #ifndef USE_HEADER_ONLY_ASIO
 #include "boost/asio.hpp"
 using namespace boost;
@@ -18,10 +20,6 @@ using namespace boost;
 #include "asio.hpp"
 #endif
 
-using namespace std;
-
-namespace CPS
-{
 class AbstractSocket
 {
 public:
@@ -41,10 +39,10 @@ public:
 	virtual ~AbstractSocket() {
 	}
 
-	virtual void connect(const string &host, int port) = 0;
+	virtual void connect(const std::string &host, int port) = 0;
 
-	virtual vector<unsigned char> send(const string &data) = 0;
-	virtual vector<unsigned char> read() = 0;
+	virtual std::vector<unsigned char> send(const std::string &data) = 0;
+	virtual std::vector<unsigned char> read() = 0;
 
 	bool isConnected() {
 		return connected;
@@ -67,7 +65,7 @@ public:
 			deadline.expires_at(boost::posix_time::pos_infin);
 		}
 
-		// Put the actor back to sleep.
+		// Put the actor back::asio to sleep.
 		deadline.async_wait(boost::bind(&AbstractSocket::check_deadline, this));
 	}
 
@@ -101,7 +99,7 @@ public:
 		connected = false;
 	}
 
-	virtual void connect(const string &host, int port) {
+	virtual void connect(const std::string &host, int port) {
 		// Set a deadline for the asynchronous operation.
 		deadline.expires_from_now(boost::posix_time::seconds(connectTimeout));
 
@@ -135,7 +133,7 @@ public:
 		connected = true;
 	}
 
-	virtual vector<unsigned char> send(const string &data) {
+	virtual std::vector<unsigned char> send(const std::string &data) {
 		// Set a deadline for the asynchronous operation.
 		deadline.expires_from_now(boost::posix_time::seconds(sendTimeout));
 
@@ -160,7 +158,7 @@ public:
 		return read();
 	}
 
-	virtual vector<unsigned char> read() {
+	virtual std::vector<unsigned char> read() {
 		// Set a deadline for the asynchronous operation.
 		deadline.expires_from_now(boost::posix_time::seconds(recieveTimeout));
 
@@ -222,7 +220,7 @@ public:
 		socket.close();
 	}
 
-	virtual void connect(const string &host, int port) {
+	virtual void connect(const std::string &host, int port) {
 		asio::local::stream_protocol::endpoint ep(host);
 
 		// Set a deadline for the asynchronous operation.
@@ -254,7 +252,7 @@ public:
 		connected = true;
 	}
 
-	virtual vector<unsigned char> send(const string &data) {
+	virtual std::vector<unsigned char> send(const std::string &data) {
 		// Set a deadline for the asynchronous operation.
 		deadline.expires_from_now(boost::posix_time::seconds(sendTimeout));
 
@@ -279,7 +277,7 @@ public:
 		return read();
 	}
 
-	virtual vector<unsigned char> read() {
+	virtual std::vector<unsigned char> read() {
 		// Set a deadline for the asynchronous operation.
 		deadline.expires_from_now(boost::posix_time::seconds(recieveTimeout));
 
@@ -341,7 +339,7 @@ public:
 	virtual ~HttpSocket() {
 	}
 
-	virtual void connect(const string &host, int port) {
+	virtual void connect(const std::string &host, int port) {
 		deadline.expires_from_now(boost::posix_time::seconds(connectTimeout));
 		error = asio::error::would_block;
 		asio::ip::tcp::resolver resolver(io_service);
@@ -358,11 +356,11 @@ public:
 		connected = true;
 	}
 
-	virtual vector<unsigned char> send(const string &data) {
+	virtual std::vector<unsigned char> send(const std::string &data) {
 		deadline.expires_from_now(boost::posix_time::seconds(sendTimeout));
 		error = asio::error::would_block;
 		// Create post headers
-		string header = "";
+		std::string header = "";
 		header += "POST " + path + " HTTP/1.0\r\n";
 		header += "Host: " + host + ":" + Utils::toString(port) + "\r\n";
 		header += "Content-Length: " + Utils::toString(data.size()) + "\r\n";
@@ -382,14 +380,14 @@ public:
 		return this->read();
 	}
 
-	virtual vector<unsigned char> read() {
+	virtual std::vector<unsigned char> read() {
 		asio::streambuf response;
 #ifndef USE_HEADER_ONLY_ASIO
 		boost::system::error_code err;
 #else
 		asio::error_code err;
 #endif
-		vector <unsigned char> reply;
+		std::vector <unsigned char> reply;
 		int read = 0;
 		bool past_header = false;
 		while ((read = asio::read(socket, response, asio::transfer_at_least(1), err)) != 0) {
@@ -411,9 +409,9 @@ public:
 	}
 
 public:
-	string host;
+	std::string host;
 	int port;
-	string path;
+	std::string path;
 
 protected:
 	asio::ip::tcp::resolver::iterator endpoint_iterator;

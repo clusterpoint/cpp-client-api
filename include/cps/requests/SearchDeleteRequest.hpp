@@ -16,7 +16,7 @@ public:
     /**
      * @param query The query string. see {@link #setQuery(const string &query) setQuery} for more info.
      */
-    SearchDeleteRequest(const string &query) :
+    SearchDeleteRequest(const std::string &query) :
         Request("search-delete") {
         setQuery(query);
     }
@@ -33,7 +33,7 @@ public:
      * @see CPS::Request::Term
      * @see CPS::Request::QueryTerm
      */
-    void setQuery(const string &query) {
+    void setQuery(const std::string &query) {
         this->setParam("query", query);
     }
 
@@ -41,7 +41,7 @@ public:
      * Sets the stemming language
      * @param stemLang 2-letter language ID
      */
-    void setStemLang(const string &stemLang) {
+    void setStemLang(const std::string &stemLang) {
         this->setParam("stem-lang", stemLang);
     }
 
@@ -49,7 +49,7 @@ public:
      * Sets the exact match option
      * @param exactMatch Exact match option : text, binary or all
      */
-    void setExactMatch(const string &exactMatch) {
+    void setExactMatch(const std::string &exactMatch) {
         this->setParam("exact-match", exactMatch);
     }
 };

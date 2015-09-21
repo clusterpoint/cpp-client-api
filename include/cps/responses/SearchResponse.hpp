@@ -25,7 +25,7 @@ public:
          * @param name term name
          * @param hits how many documents match this facet
          */
-        Term(const string &name, int hits) {
+        Term(const std::string &name, int hits) {
             this->name = name;
             this->hits = hits;
         }
@@ -33,38 +33,38 @@ public:
         }
 
         /** Term name */
-        string name;
+        std::string name;
         /** How many documents match this facet */
         int hits;
     };
 
     /** @param path Facet path */
-    SearchFacet(const string &path = "") {
+    SearchFacet(const std::string &path = "") {
         this->path = path;
     }
     virtual ~SearchFacet() {
     }
 
     /** Facet path */
-    string path;
+    std::string path;
     /** Vector of terms for this facet */
-    vector<Term> terms;
+    std::vector<Term> terms;
 };
 
 class SearchAggregate
 {
 public:
     /** @param query The query of the aggregate */
-    SearchAggregate(const string &query = "") {
+    SearchAggregate(const std::string &query = "") {
         this->query = query;
     }
     virtual ~SearchAggregate() {
     }
 
     /** Aggregate query */
-    string query;
+    std::string query;
     /** Vector of aggregate results */
-    vector<map<string, string> > data;
+    std::vector<std::map<std::string, std::string> > data;
 };
 
 class SearchResponse: public Response
@@ -76,7 +76,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    SearchResponse(string rawResponse) :
+    SearchResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~SearchResponse() {
@@ -116,16 +116,16 @@ public:
     /**
      * Returns the map of facets where key is path for facet and value as object of type SearchFacet
      */
-    map<string, SearchFacet> getFacets() {
+    std::map<std::string, SearchFacet> getFacets() {
         if (!_facets.empty())
             return _facets;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/facet", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
-            list<Node *> terms = ns[i]->getChildren("term");
+        	std::list<Node *> terms = ns[i]->getChildren("term");
             SearchFacet facet(ns[i]->getAttribute("path")->getValue());
-            for (list<Node *>::iterator it = terms.begin(); it != terms.end();
+            for (std::list<Node *>::iterator it = terms.begin(); it != terms.end();
                     it++) {
-                string name = (*it)->getContent();
+            	std::string name = (*it)->getContent();
                 int hits = atoi((*it)->getAttribute("hits")->getContentPtr());
                 facet.terms.push_back(SearchFacet::Term(name, hits));
             }
@@ -137,19 +137,19 @@ public:
     /**
      * Returns the map of aggregates where key is query for aggregate and value as object of type SearchAggregate
      */
-    map<string, SearchAggregate> getAggregates() {
+    std::map<std::string, SearchAggregate> getAggregates() {
         if (!_aggregates.empty())
             return _aggregates;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/aggregate", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
-            list<Node *> query = ns[i]->getChildren("query");
-            list<Node *> data = ns[i]->getChildren("data");
+        	std::list<Node *> query = ns[i]->getChildren("query");
+        	std::list<Node *> data = ns[i]->getChildren("data");
             if (query.empty() || data.empty())
                 continue;
             SearchAggregate aggregate(query.front()->getValue());
-            for (list<Node *>::iterator it = data.begin(); it != data.end();
+            for (std::list<Node *>::iterator it = data.begin(); it != data.end();
                     it++) {
-                map<string, string> fields;
+            	std::map<std::string, std::string> fields;
                 Node *child = (*it)->getFirstChild();
                 while (child) {
                     fields[child->getName()] = child->getValue();
@@ -167,7 +167,7 @@ public:
      * @param documentTagName string that identifies root of document
      * @param formatted boolean, true if document should be formatted with spaces for better readability
      */
-    vector<string> getDocumentsString(bool formatted = true) {
+    std::vector<std::string> getDocumentsString(bool formatted = true) {
         if (!_documentsString.empty())
             return _documentsString;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/results/" + documentRootXpath, true);
@@ -182,7 +182,7 @@ public:
      * @param documentTagName string that identifies root of document
      * @see XMLDocument
      */
-    vector<XMLDocument*> getDocumentsXML() {
+    std::vector<XMLDocument*> getDocumentsXML() {
         if (!_documentsXML.empty())
             return _documentsXML;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/results/" + documentRootXpath, true);
@@ -193,10 +193,10 @@ public:
     }
 
 private:
-    vector<string> _documentsString;
-    vector<XMLDocument*> _documentsXML;
-    map<string, SearchFacet> _facets;
-    map<string, SearchAggregate> _aggregates;
+    std::vector<std::string> _documentsString;
+    std::vector<XMLDocument*> _documentsXML;
+    std::map<std::string, SearchFacet> _facets;
+    std::map<std::string, SearchAggregate> _aggregates;
 };
 
 }

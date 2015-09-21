@@ -26,7 +26,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    ModifyResponse(string rawResponse) :
+    ModifyResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~ModifyResponse() {
@@ -35,7 +35,7 @@ public:
     /**
      * Returns an array of IDs of documents that have been successfully modified
      */
-    vector<string>& getModifiedIds() {
+    std::vector<std::string>& getModifiedIds() {
         if (!_modifiedIds.empty()) return _modifiedIds;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/" + documentRootXpath + "/id", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
@@ -44,7 +44,7 @@ public:
         return _modifiedIds;
     }
 private:
-    vector<string> _modifiedIds;
+    std::vector<std::string> _modifiedIds;
 };
 }
 

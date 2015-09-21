@@ -19,7 +19,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    ListPathsResponse(string rawResponse) :
+    ListPathsResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~ListPathsResponse() {
@@ -28,7 +28,7 @@ public:
     /**
      * Returns paths that exist in this storage
      */
-    vector <string>& getPaths() {
+    std::vector <std::string>& getPaths() {
         if (!_paths.empty()) return _paths;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/paths/path", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
@@ -37,7 +37,7 @@ public:
         return _paths;
     }
 private:
-    vector <string> _paths;
+    std::vector <std::string> _paths;
 };
 }
 

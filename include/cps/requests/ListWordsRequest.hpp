@@ -17,7 +17,7 @@ public:
      * Constructs an instance of CPSListWordsRequest
      * @param query term with wildcards as a string to count occurances
      */
-    ListWordsRequest(const string &query) :
+    ListWordsRequest(const std::string &query) :
         Request("list-words") {
         setQuery(query);
     }
@@ -25,7 +25,7 @@ public:
      * Constructs an instance of CPSListWordsRequest
      * @param query vector of terms with wildcards as a string to count occurances
      */
-    ListWordsRequest(const vector <string> &query) :
+    ListWordsRequest(const std::vector <std::string> &query) :
         Request("list-words") {
         setQuery(query);
     }
@@ -35,15 +35,15 @@ public:
     /**
      * @param query term with wildcards as a string to count occurances
      */
-    void setQuery(const string &query) {
+    void setQuery(const std::string &query) {
         this->setParam("query", query);
     }
 
     /**
      * @param query vector of terms with wildcards as a string to count occurances
      */
-    void setQuery(const vector <string> &query) {
-        string q = "";
+    void setQuery(const std::vector <std::string> &query) {
+    	std::string q = "";
         for (unsigned int i = 0; i < query.size(); i++) q += query[i] + " ";
         this->setParam("query", q);
     }

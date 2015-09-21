@@ -8,9 +8,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-using namespace rapidxml;
-
 namespace CPS
 {
 
@@ -23,7 +20,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    Response(string rawResponse, string documentRootXpath = "document", string documentIdXpath = "document/id"): failed(false) {
+    Response(std::string rawResponse, std::string documentRootXpath = "document", std::string documentIdXpath = "document/id"): failed(false) {
         this->documentRootXpath = documentRootXpath;
         this->documentIdXpath = documentIdXpath;
         try {
@@ -50,7 +47,7 @@ public:
     /**
      * Returns executed command name
      */
-    string getCommand() {
+    std::string getCommand() {
         NodeSet ns = doc->FindFast("cps:reply/cps:command", false);
         if (ns.size() == 1) {
             return ns[0]->getContent().c_str();
@@ -61,7 +58,7 @@ public:
     /**
      * Returns storage name for what request was executed
      */
-    string getStorage() {
+    std::string getStorage() {
         NodeSet ns = doc->FindFast("cps:reply/cps:storage", false);
         if (ns.size() == 1) {
             return ns[0]->getContent().c_str();
@@ -72,15 +69,15 @@ public:
     /**
      * Returns vector of errors encountered
      */
-    const vector<Error>& getErrors() {
+    const std::vector<Error>& getErrors() {
         if (!errors.empty()) return errors;
         NodeSet ns = doc->FindFast("cps:reply/cps:error", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
             Error err;
             Node *el = ns[i]->getFirstChild();
             while (el != NULL) {
-                string name = el->getName();
-                string value = el->getContent();
+            	std::string name = el->getName();
+            	std::string value = el->getContent();
                 if (name == "code")
                     err.code = value;
                 else if (name == "text")
@@ -107,14 +104,14 @@ public:
     /**
      * Returns parsed XML as string
      */
-    string toString() {
+    std::string toString() {
         return doc->toString(true);
     }
 
     /**
      * Returns parameter value from reply's content
      */
-    template<class T> T getParam(string key, T def = T()) {
+    template<class T> T getParam(std::string key, T def = T()) {
         NodeSet ns = doc->FindFast("cps:reply/cps:content/" + key, false);
         if (ns.size() == 1) {
             return boost::lexical_cast<T>(ns[0]->getContent());
@@ -130,11 +127,11 @@ public:
     /** Parsed reply as XMLDocument */
     XMLDocument *doc;
     /** Vector of errors returned from CPS */
-    vector<Error> errors;
+    std::vector<Error> errors;
     bool failed; // Did the response contain errors about failing
 
-    string documentRootXpath;
-    string documentIdXpath;
+    std::string documentRootXpath;
+    std::string documentIdXpath;
 };
 }
 

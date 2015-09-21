@@ -16,14 +16,14 @@ public:
     /**
      * @param command name of the command
      */
-    ModifyRequest(const string &command) :
+    ModifyRequest(const std::string &command) :
         Request(command) {
     }
     /**
      * @param command name of the command
      * @param document document XML as string
      */
-    ModifyRequest(const string &command, const string &document) :
+    ModifyRequest(const std::string &command, const std::string &document) :
         Request(command) {
         setDocument(document);
     }
@@ -31,7 +31,7 @@ public:
      * @param command name of the command
      * @param document document XML as string
      */
-    ModifyRequest(const string &command, const char document[]) :
+    ModifyRequest(const std::string &command, const char document[]) :
         Request(command) {
         setDocument(document);
     }
@@ -40,7 +40,7 @@ public:
      * @param id id of document
      * @param document document XML as string
      */
-    ModifyRequest(const string &command, const string &id, const string &document) :
+    ModifyRequest(const std::string &command, const std::string &id, const std::string &document) :
         Request(command) {
         setDocument(id, document);
     }
@@ -48,7 +48,7 @@ public:
      * @param command name of the command
      * @param documents documents as array of strings or map with key as document id and value as document XML as string
      */
-    template<class T> ModifyRequest(const string& command, const T &documents) :
+    template<class T> ModifyRequest(const std::string& command, const T &documents) :
         Request(command) {
         setDocuments(documents);
     }
@@ -63,7 +63,7 @@ public:
      * @param id id of document to insert
      * @param document document XML as string
      */
-    InsertRequest(const string &id, const string &document) :
+    InsertRequest(const std::string &id, const std::string &document) :
         ModifyRequest("insert", id, document) {
     }
     /**
@@ -83,7 +83,7 @@ public:
      * @param id id of document to replace
      * @param document string to update found document with
      */
-    UpdateRequest(const string &id, const string &document) :
+    UpdateRequest(const std::string &id, const std::string &document) :
         ModifyRequest("update", id, document) {
     }
     /**
@@ -103,7 +103,7 @@ public:
      * @param id id of document to update
      * @param document string to replace found document with
      */
-    ReplaceRequest(const string &id, const string &document) :
+    ReplaceRequest(const std::string &id, const std::string &document) :
         ModifyRequest("replace", id, document) {
     }
     /**
@@ -123,7 +123,7 @@ public:
      * @param id id of document to partially replace
      * @param document string to partially replace found document with
      */
-    PartialReplaceRequest(const string &id, const string &document) :
+    PartialReplaceRequest(const std::string &id, const std::string &document) :
         ModifyRequest("partial-replace", id, document) {
     }
     /**
@@ -142,13 +142,13 @@ public:
     /**
      * @param id ID of document to delete
      */
-    DeleteRequest(const string &id) :
+    DeleteRequest(const std::string &id) :
         ModifyRequest("delete", id, "") {
     }
     /**
      * @param ids array of ids to delete
      */
-    DeleteRequest(const vector<string> &ids) :
+    DeleteRequest(const std::vector<std::string> &ids) :
         ModifyRequest("delete") {
         for (unsigned int i = 0; i < ids.size(); i++) {
             setDocument(ids[i], "");

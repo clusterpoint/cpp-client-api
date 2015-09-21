@@ -17,7 +17,7 @@ public:
      * @param id id of document to show history for
      * @param returnDocs should full documents be returned
      */
-    ShowHistoryRequest(const string &id, bool returnDocs = true) :
+    ShowHistoryRequest(const std::string &id, bool returnDocs = true) :
         Request("show-history") {
         documentsWithUserId[id] = "";
         if (returnDocs == true)

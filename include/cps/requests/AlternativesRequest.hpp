@@ -19,7 +19,7 @@ public:
      * @param idif see {@link setIdif(double) setIdif}
      * @param h see {@link setH(double) setH}
      */
-    AlternativesRequest(const string &query, double cr = 2.0, double idif = 3.0, double h = 2.5) :
+    AlternativesRequest(const std::string &query, double cr = 2.0, double idif = 3.0, double h = 2.5) :
         Request("alternatives") {
         setQuery(query);
         if (cr != 2.0) setCr(cr);
@@ -38,7 +38,7 @@ public:
      * All <, > and & characters that aren't supposed to be XML tags, should be escaped;
      * @see CPS_Term
      */
-    void setQuery(const string &query) {
+    void setQuery(const std::string &query) {
         this->setParam("query", query);
     }
 

@@ -43,7 +43,7 @@ public:
 class StatusIndex
 {
 public:
-    StatusIndex(string indexSpeed, int memoryPoolUsage, string status,
+    StatusIndex(std::string indexSpeed, int memoryPoolUsage, std::string status,
                 int totalWords) {
         this->indexSpeed = indexSpeed;
         this->memoryPoolUsage = memoryPoolUsage;
@@ -54,11 +54,11 @@ public:
     }
 
     /** indexing speed MB/s */
-    string indexSpeed;
+    std::string indexSpeed;
     /** usage of memory pool in RAM */
     int memoryPoolUsage;
     /** index state: normal, dumping, merging */
-    string status;
+    std::string status;
     /** number of all words in the Storage */
     int totalWords;
 };
@@ -72,7 +72,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    StatusResponse(string rawResponse) :
+    StatusResponse(std::string rawResponse) :
         Response(rawResponse) {
     	single = doc->FindFast("cps:reply/cps:content/all").size() == 0;
     	prefix = single ? "" : "all/";
@@ -83,8 +83,8 @@ public:
     /**
      * Returns Clusterpoint Server version number
      */
-    string getVersion() {
-        return getParam<string>("version", "");
+    std::string getVersion() {
+        return getParam<std::string>("version", "");
     }
 
     /**
@@ -97,8 +97,8 @@ public:
     /**
      * Returns license type: persistent/timed
      */
-    string getLicense() {
-        return getParam<string>(prefix + "license", "");
+    std::string getLicense() {
+        return getParam<std::string>(prefix + "license", "");
     }
 
     /**
@@ -151,13 +151,13 @@ public:
         if (ns.size() != 1) {
             return StatusIndex("", 0, "", totalWords);
         }
-        string indexSpeed = "";
+        std::string indexSpeed = "";
         if (ns[0]->getChildren("index_speed").size() > 0)
         	indexSpeed = ns[0]->getChildren("index_speed").front()->getContent();
         int memoryPoolUsage = 0;
         if (ns[0]->getChildren("memory_pool_usage").size() > 0)
         	memoryPoolUsage = atoi(ns[0]->getChildren("memory_pool_usage").front()->getContentPtr());
-        string status = "";
+        std::string status = "";
         if (ns[0]->getChildren("status").size() > 0)
         	status = ns[0]->getChildren("status").front()->getContent();
         return StatusIndex(indexSpeed, memoryPoolUsage, status, totalWords);
@@ -167,13 +167,13 @@ public:
      * Returns progress for process.
      * Possible types: reindex, synchronize, backup, restore
      */
-    string getProgress(const string& type) {
-        return getParam<string>(prefix + type + "/progress", "");
+    std::string getProgress(const std::string& type) {
+        return getParam<std::string>(prefix + type + "/progress", "");
     }
 
 private:
     bool single;
-    string prefix;
+    std::string prefix;
 };
 }
 

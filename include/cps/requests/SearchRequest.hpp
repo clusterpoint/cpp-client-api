@@ -20,8 +20,8 @@ public:
      * @param docs Maximum document count to retrieve
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    SearchRequest(string query, int offset = 0, int docs = 10,
-                  const map<string, string> &list = Request::MapStringStringType()) :
+    SearchRequest(std::string query, int offset = 0, int docs = 10,
+                  const std::map<std::string, std::string> &list = Request::MapStringStringType()) :
         Request("search") {
         this->setQuery(query);
         if (offset != 0)
@@ -45,7 +45,7 @@ public:
      * @see CPS::Request::Term
      * @see CPS::Request::QueryTerm
      */
-    void setQuery(const string &query) {
+    void setQuery(const std::string &query) {
         this->setParam("query", query);
     }
 
@@ -69,15 +69,15 @@ public:
      * Sets the paths for facets
      * @param facet path of facet
      */
-    void setFacet(const string &facet) {
-        this->setFacets(vector < string > (1, facet));
+    void setFacet(const std::string &facet) {
+        this->setFacets(std::vector<std::string> (1, facet));
     }
 
     /**
      * Sets the paths for facets
      * @param facets array of paths of facets
      */
-    void setFacets(const vector<string> &facets) {
+    void setFacets(const std::vector<std::string> &facets) {
         this->setParam("facet", facets);
     }
 
@@ -93,15 +93,15 @@ public:
      * Sets aggregate functions
      * @param aggregate The aggregate function
      */
-    void setAggregate(const string &aggregate) {
-        this->setAggregate(vector < string > (1, aggregate));
+    void setAggregate(const std::string &aggregate) {
+        this->setAggregate(std::vector<std::string> (1, aggregate));
     }
 
     /**
      * Sets aggregate functions
      * @param aggregates The list of aggregate functions
      */
-    void setAggregate(const vector<string> &aggregates) {
+    void setAggregate(const std::vector<std::string> &aggregates) {
         this->setParam("aggregate", aggregates);
     }
 
@@ -109,7 +109,7 @@ public:
      * Sets the stemming language
      * @param stemLang 2-letter language ID
      */
-    void setStemLang(const string &stemLang) {
+    void setStemLang(const std::string &stemLang) {
         this->setParam("stem-lang", stemLang, true);
     }
 
@@ -117,7 +117,7 @@ public:
      * Sets the exact match option
      * @param exactMatch Exact match option : text, binary or all
      */
-    void setExactMatch(const string &exactMatch) {
+    void setExactMatch(const std::string &exactMatch) {
         this->setParam("exact-match", exactMatch, true);
     }
 
@@ -126,7 +126,7 @@ public:
      * @param tagName name of the grouping tag
      * @param count maximum number of documents to return from each group
      */
-    void setGroup(const string &tagName, int count) {
+    void setGroup(const std::string &tagName, int count) {
         this->setParam("group", tagName);
         this->setParam("group_size", Utils::toString(count), true);
     }
@@ -135,9 +135,9 @@ public:
      * Defines which tags of the search results should be listed in the response
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    void setList(const map<string, string> &list) {
-        string listString = "";
-        for (map<string, string>::const_iterator it = list.begin();
+    void setList(const std::map<std::string, std::string> &list) {
+    	std::string listString = "";
+        for (std::map<std::string, std::string>::const_iterator it = list.begin();
                 it != list.end(); ++it) {
             listString += Request::Term(it->second, it->first);
         }
@@ -149,7 +149,7 @@ public:
      * @param order sorting string
      * @see CPS::Ordering
      */
-    void setOrdering(const string &order) {
+    void setOrdering(const std::string &order) {
         this->setParam("ordering", order);
     }
 
@@ -158,7 +158,7 @@ public:
      * @param order array of sorting strings
      * @see CPS::Ordering
      */
-    void setOrdering(const vector<string> &order) {
+    void setOrdering(const std::vector<std::string> &order) {
         this->setParam("ordering", CPS::Utils::join(order, ""));
     }
 };

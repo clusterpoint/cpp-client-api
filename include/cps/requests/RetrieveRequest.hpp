@@ -16,14 +16,14 @@ public:
     /**
      * @param id ID of document to retrieve
      */
-    RetrieveRequest(const string &id) :
+    RetrieveRequest(const std::string &id) :
         Request("retrieve") {
-        setIds(vector < string > (1, id));
+        setIds(std::vector < std::string > (1, id));
     }
     /**
      * @param ids array of IDs of document to retrieve
      */
-    RetrieveRequest(const vector<string> &ids) :
+    RetrieveRequest(const std::vector<std::string> &ids) :
         Request("retrieve") {
         setIds(ids);
     }
@@ -33,13 +33,13 @@ public:
     /**
      * @param id ID of document to retrieve
      */
-    void setId(const string &id) {
+    void setId(const std::string &id) {
         documentsWithUserId[id] = "";
     }
     /**
      * @param ids array of IDs of document to retrieve
      */
-    void setIds(const vector<string> &ids) {
+    void setIds(const std::vector<std::string> &ids) {
         for (unsigned int i = 0; i < ids.size(); i++) {
             documentsWithUserId[ids[i]] = "";
         }

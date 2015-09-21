@@ -10,9 +10,6 @@
 #include "Utils.hpp"
 #include "Xmldocument.hpp"
 
-using namespace std;
-using namespace rapidxml;
-
 namespace CPS
 {
 
@@ -25,14 +22,14 @@ public:
      * @param command Specifies the command field for the request
      * @param requestId The request ID. Can be useful for identifying a particular request in a log file when debugging
      */
-    Request(string command, string requestId = "")
+    Request(std::string command, std::string requestId = "")
     {
         this->command = command;
         this->requestId = requestId;
         this->label = "";
         this->requestType = "auto";
 
-        string _textParamNames[] = { "added_external_id", "added_id", "aggregate",
+        std::string _textParamNames[] = { "added_external_id", "added_id", "aggregate",
                 "case_sensitive", "cr", "deleted_external_id", "deleted_id",
                 "description", "docs", "exact-match", "facet", "facet_size",
                 "fail_if_exists", "file", "finalize", "for", "force", "from",
@@ -41,11 +38,11 @@ public:
                 "quota", "rate2_ordering", "rate_from", "rate_to", "relevance",
                 "return_doc", "return_internal", "sequence_check", "stem-lang",
                 "step_size", "text", "transaction_id", "type" };
-        textParamNames = vector <string> (_textParamNames, _textParamNames + 44);
+        textParamNames = std::vector <std::string> (_textParamNames, _textParamNames + 44);
         sort(textParamNames.begin(), textParamNames.end());
 
-        string _rawParamNames[] = { "list", "query", "ordering", "shapes" };
-        rawParamNames = vector < string > (_rawParamNames, _rawParamNames + 4);
+        std::string _rawParamNames[] = { "list", "query", "ordering", "shapes" };
+        rawParamNames = std::vector <std::string> (_rawParamNames, _rawParamNames + 4);
         sort(rawParamNames.begin(), rawParamNames.end());
     }
 
@@ -56,7 +53,7 @@ public:
     /**
      * Returns request command name
      */
-    string getCommand() const
+    std::string getCommand() const
     {
         return this->command;
     }
@@ -71,21 +68,21 @@ public:
      *
      * @return string Full request XML as string
      */
-    string getRequestXml(const string &docRootXpath, const string &docIdXpath,
-            const map<string, vector<string> > &envelopeParams,
+    std::string getRequestXml(const std::string &docRootXpath, const std::string &docIdXpath,
+            const std::map<std::string, std::vector<std::string> > &envelopeParams,
             bool createXML = false, long long transactionId = -1) const {
 
         XMLDocument *doc = NULL;
         Node *root = NULL, *content = NULL;
-        string xml_as_string;
+        std::string xml_as_string;
 
         if (createXML == true) {
-            doc = XMLDocument::create(new xml_document<>());
+            doc = XMLDocument::create(new rapidxml::xml_document<>());
             root = doc->createRootNode("request", "www.clusterpoint.com", "cps");
         } else {
             xml_as_string = "<cps:request xmlns:cps=\"www.clusterpoint.com\">";
         }
-        for (map<string, vector<string> >::const_iterator it = envelopeParams.begin(); it != envelopeParams.end(); ++it) {
+        for (std::map<std::string, std::vector<std::string> >::const_iterator it = envelopeParams.begin(); it != envelopeParams.end(); ++it) {
             for (unsigned int i = 0; i < it->second.size(); i++) {
                 if (createXML == true) {
                     root->addChild(it->first, "cps")->addChildText(getValidXmlValue(it->second[i]));
@@ -105,15 +102,15 @@ public:
         // Add transaction id if needed
         if (transactionId != -1) {
             if (createXML == true) {
-                content->addChild("transaction_id")->addChildText(boost::lexical_cast<string>(transactionId));
+                content->addChild("transaction_id")->addChildText(boost::lexical_cast<std::string>(transactionId));
             } else {
                 xml_as_string += "<transaction_id>";
-                xml_as_string += boost::lexical_cast<string>(transactionId);
+                xml_as_string += boost::lexical_cast<std::string>(transactionId);
                 xml_as_string += "</transaction_id>";
             }
         }
 
-        for (map<string, vector<string> >::const_iterator it = textParams.begin(); it != textParams.end(); ++it) {
+        for (std::map<std::string, std::vector<std::string> >::const_iterator it = textParams.begin(); it != textParams.end(); ++it) {
             for (unsigned int i = 0; i < it->second.size(); i++) {
                 if (createXML == true) {
                     content->addChild(it->first)->addChildText(Utils::toString(it->second[i]));
@@ -125,7 +122,7 @@ public:
             }
         }
         // Add special fields: query, list, ordering
-        for (map<string, vector<string> >::const_iterator it = rawParams.begin(); it != rawParams.end(); ++it) {
+        for (std::map<std::string, std::vector<std::string> >::const_iterator it = rawParams.begin(); it != rawParams.end(); ++it) {
             for (unsigned int i = 0; i < it->second.size(); i++) {
                 if (createXML == true) {
                     XMLDocument* fragment = XMLDocument::parseFromMemory("<" + it->first + ">" + it->second[i] + "</" + it->first + ">");
@@ -138,10 +135,10 @@ public:
         }
 
         // documents, document Ids
-        for (map<string, string>::const_iterator it = documentsWithUserId.begin(); it != documentsWithUserId.end(); ++it) {
+        for (std::map<std::string, std::string>::const_iterator it = documentsWithUserId.begin(); it != documentsWithUserId.end(); ++it) {
             // ID tag_name is what is left after removing docRootXpath prefix
-            string id_tag_name = docIdXpath.substr(docRootXpath.size());
-            string document = xmlUtilCreatePath(id_tag_name.c_str(), it->first.c_str()) + it->second;
+        	std::string id_tag_name = docIdXpath.substr(docRootXpath.size());
+        	std::string document = xmlUtilCreatePath(id_tag_name.c_str(), it->first.c_str()) + it->second;
             if (createXML == true) {
                 XMLDocument* fragment = XMLDocument::parseFromMemory(xmlUtilCreatePath(docRootXpath.c_str(), document.c_str()));
                 content->importNode(fragment->getRootNode());
@@ -150,9 +147,9 @@ public:
                 xml_as_string += xmlUtilCreatePath(docRootXpath.c_str(), document.c_str());
             }
         }
-        for (vector<string>::const_iterator it = documentsWithAutoId.begin(); it != documentsWithAutoId.end(); ++it) {
-            string document;
-            if (it->find("<" + docRootXpath + " ") != string::npos || it->find("<" + docRootXpath + ">") != string::npos) {
+        for (std::vector<std::string>::const_iterator it = documentsWithAutoId.begin(); it != documentsWithAutoId.end(); ++it) {
+        	std::string document;
+            if (it->find("<" + docRootXpath + " ") != std::string::npos || it->find("<" + docRootXpath + ">") != std::string::npos) {
                 document = *it;
             } else {
                 document = xmlUtilCreatePath(docRootXpath.c_str(), it->c_str());
@@ -179,7 +176,7 @@ public:
     /**
      * Returns request id
      */
-    string getRequestId() const
+    std::string getRequestId() const
     {
         return requestId;
     }
@@ -187,14 +184,14 @@ public:
      * Sets request id.
      * @param requestId string of request id
      */
-    void setRequestId(const string &requestId)
+    void setRequestId(const std::string &requestId)
     {
         this->requestId = requestId;
     }
     /**
      * Returns request type
      */
-    string getRequestType() const
+    std::string getRequestType() const
     {
         return requestType;
     }
@@ -205,14 +202,14 @@ public:
      * @param requestType string request type
      * One of following: auto(default) / single / cluster
      */
-    void setRequestType(const string &requestType = "auto")
+    void setRequestType(const std::string &requestType = "auto")
     {
         this->requestType = requestType;
     }
     /**
      * Returns label for cluster nodeset
      */
-    string getClusterLabel() const
+    std::string getClusterLabel() const
     {
         return label;
     }
@@ -220,7 +217,7 @@ public:
      * Sets label for cluster nodeset
      * @param clusterLabel string label for cluster nodeset
      */
-    void setClusterLabel(const string &clusterLabel)
+    void setClusterLabel(const std::string &clusterLabel)
     {
         this->label = clusterLabel;
     }
@@ -230,7 +227,7 @@ public:
      * @param src original string
      * @return string
      */
-    static string getValidXmlValue(string src)
+    static std::string getValidXmlValue(std::string src)
     {
         for (unsigned int i = 0; i < src.size(); i++) {
             if ((src[i] <= 0x1f)
@@ -251,7 +248,7 @@ public:
      * @param values vector of values
      * @param replace should existing value be replaced
      */
-    void setParam(const string &name, const vector<string> &values, bool replace = false)
+    void setParam(const std::string &name, const std::vector<std::string> &values, bool replace = false)
     {
         if (binary_search(textParamNames.begin(), textParamNames.end(), name)) {
         	if (replace) textParams[name] = values;
@@ -271,16 +268,16 @@ public:
      * @param value string as parameter value
      * @param replace should existing value be replaced
      */
-    void setParam(const string &name, const string &value, bool replace = false)
+    void setParam(const std::string &name, const std::string &value, bool replace = false)
     {
-        setParam(name, vector < string > (1, value), replace);
+        setParam(name, std::vector<std::string> (1, value), replace);
     }
 
     /**
      * Set document to send as string
      * @param document document XML as string
      */
-    void setDocument(const string &document) {
+    void setDocument(const std::string &document) {
         documentsWithAutoId.push_back(document);
     }
     /**
@@ -288,14 +285,14 @@ public:
      * @param id id of document
      * @param document document XML as string
      */
-    void setDocument(const string &id, const string &document) {
+    void setDocument(const std::string &id, const std::string &document) {
         documentsWithUserId[id] = document;
     }
     /**
      * Set documents to send as string
      * @param documents array of documents XML as string
      */
-    void setDocuments(const vector<string> &documents) {
+    void setDocuments(const std::vector<std::string> &documents) {
         documentsWithAutoId.insert(this->documentsWithAutoId.begin(),
                                    documents.begin(), documents.end());
     }
@@ -303,7 +300,7 @@ public:
      * Set documents to send as string
      * @param documents map with key as document id and value as document XML as string
      */
-    void setDocuments(const map<string, string> &documents) {
+    void setDocuments(const std::map<std::string, std::string> &documents) {
         documentsWithUserId.insert(documents.begin(), documents.end());
     }
 
@@ -313,11 +310,11 @@ public:
      * @param doc Map of parameters where key is xpath of parameter and value is value of parameter
      * @param escape Should values be escaped
      */
-    static string createSimpleDocument(const map<string, string> &doc,
+    static std::string createSimpleDocument(const std::map<std::string, std::string> &doc,
             bool escape = true)
     {
-        string result = "";
-        for (map<string, string>::const_iterator it = doc.begin(); it != doc.end(); ++it) {
+    	std::string result = "";
+        for (std::map<std::string, std::string>::const_iterator it = doc.begin(); it != doc.end(); ++it) {
             result += Term(it->second, it->first, escape);
         }
         return result;
@@ -334,7 +331,7 @@ public:
      * @param xpath an optional xpath, to be specified if the search term is to be searched under a specific xpath
      * @param escape an optional parameter - whether to escape the term's XML
      */
-    static string Term(string term, string xpath = "", bool escape = true)
+    static std::string Term(std::string term, std::string xpath = "", bool escape = true)
     {
         return xmlUtilCreatePath(xpath.c_str(),
                 ((escape) ? Utils::xmlspecialchars(term) : term).c_str());
@@ -348,13 +345,13 @@ public:
      * @param xpath an optional xpath, to be specified if the search term is to be searched under a specific xpath
      * @param allowedSymbols a string containing operator symbols that the user is allowed to use (e.g. ")
      */
-    static string QueryTerm(const string &term, const string &xpath = "",
-            string allowedSymbols = "")
+    static std::string QueryTerm(const std::string &term, const std::string &xpath = "",
+    		std::string allowedSymbols = "")
     {
-        string invalidSymbols = "@$\"=<>(){}!+";
-        string newTerm = "";
+    	std::string invalidSymbols = "@$\"=<>(){}!+";
+    	std::string newTerm = "";
         for (unsigned int i = 0; i < term.size(); i++) {
-            if (invalidSymbols.find(term[i]) != string::npos &&  allowedSymbols.find(term[i]) == string::npos) {
+            if (invalidSymbols.find(term[i]) != std::string::npos &&  allowedSymbols.find(term[i]) == std::string::npos) {
                 newTerm += "\\";
             }
             newTerm += term[i];
@@ -364,27 +361,27 @@ public:
 
 protected:
     /** Command name. For example: search, lookup, list-last etc. */
-    string command;
+    std::string command;
     /** message id (any format) - for logging purposes */
-    string requestId;
+    std::string requestId;
     /** Label for cluster nodeset */
-    string label;
+    std::string label;
     /** Request type: auto(default) / single / cluster - type of request processing. */
-    string requestType;
+    std::string requestType;
     /** List of text params */
-    map<string, vector<string> > textParams;
+    std::map<std::string, std::vector<std::string> > textParams;
     /** List of raw params */
-    map<string, vector<string> > rawParams;
+    std::map<std::string, std::vector<std::string> > rawParams;
     /** Documents with user set id */
-    map<string, string> documentsWithUserId;
+    std::map<std::string, std::string> documentsWithUserId;
     /** Documents without id (auto increment id) or id already included in document */
-    vector<string> documentsWithAutoId;
+    std::vector<std::string> documentsWithAutoId;
 
 private:
     /** Params that are of text type */
-    vector<string> textParamNames;
+    std::vector<std::string> textParamNames;
     /** Params that are of raw type */
-    vector<string> rawParamNames;
+    std::vector<std::string> rawParamNames;
 
 };
 
@@ -414,7 +411,7 @@ public:
      * @see CPS::SearchRequest::setOrdering()
      * @param ascending parameter to specify ascending/descending order
      */
-    static string RelevanceOrdering(bool ascending = true)
+    static std::string RelevanceOrdering(bool ascending = true)
     {
         return "<relevance>" + Order(ascending) + "</relevance>";
     }
@@ -425,7 +422,7 @@ public:
      * @param tag the xpath of the tag by which You wish to perform sorting
      * @param ascending parameter to specify ascending/descending order
      */
-    static string NumericOrdering(const string &tag, bool ascending = true)
+    static std::string NumericOrdering(const std::string &tag, bool ascending = true)
     {
         return "<numeric>" + Request::Term(Order(ascending), tag) + "</numeric>";
     }
@@ -436,7 +433,7 @@ public:
      * @param tag the xpath of the tag by which You wish to perform sorting
      * @param ascending parameter to specify ascending/descending order
      */
-    static string DateOrdering(const string &tag, bool ascending = true)
+    static std::string DateOrdering(const std::string &tag, bool ascending = true)
     {
         return "<date>" + Request::Term(Order(ascending), tag) + "</date>";
     }
@@ -448,7 +445,7 @@ public:
      * @param lang specifies the language (collation) to be used for ordering. E.g. "en"
      * @param ascending parameter to specify ascending/descending order
      */
-    static string StringOrdering(const string &tag, const string &lang,
+    static std::string StringOrdering(const std::string &tag, const std::string &lang,
             bool ascending = true)
     {
         return "<string>" + Request::Term(Order(ascending) + "," + lang, tag)
@@ -458,7 +455,7 @@ public:
     /**
      * Return asending or descending string
      */
-    static string Order(bool ascending = true)
+    static std::string Order(bool ascending = true)
     {
         return (ascending) ? "ascending" : "descending";
     }
@@ -469,13 +466,13 @@ public:
      * @param coords array of maps where key is xpath and value is centerpoint coordinates as values. Should contain exactly two elements - latitude first and longitude second
      * @param ascending parameter to specify ascending/descending order
      */
-    static string LatLonDistanceOrdering(
-            const vector<map<string, string> > &coords, bool ascending)
+    static std::string LatLonDistanceOrdering(
+            const std::vector<std::map<std::string, std::string> > &coords, bool ascending)
     {
-        string ordering = "<distance type=\"latlong\" order=\""
+    	std::string ordering = "<distance type=\"latlong\" order=\""
                 + Order(ascending) + "\"";
         for (unsigned int i = 0; i < coords.size(); i++) {
-            for (map<string, string>::const_iterator it = coords[i].begin();
+            for (std::map<std::string, std::string>::const_iterator it = coords[i].begin();
                     it != coords[i].end(); ++it) {
                 ordering += Request::Term(it->second, it->first);
             }
@@ -489,13 +486,13 @@ public:
      * @param coords array of maps where key is xpath and value is centerpoint coordinates as values.
      * @param ascending parameter to specify ascending/descending order
      */
-    static string PlaneDistanceOrdering(
-            const vector<map<string, string> > &coords, bool ascending)
+    static std::string PlaneDistanceOrdering(
+            const std::vector<std::map<std::string, std::string> > &coords, bool ascending)
     {
-        string ordering = "<distance type=\"plane\" order=\"" + Order(ascending)
+    	std::string ordering = "<distance type=\"plane\" order=\"" + Order(ascending)
                 + "\"";
         for (unsigned int i = 0; i < coords.size(); i++) {
-            for (map<string, string>::const_iterator it = coords[i].begin();
+            for (std::map<std::string, std::string>::const_iterator it = coords[i].begin();
                     it != coords[i].end(); ++it) {
                 ordering += Request::Term(it->second, it->first);
             }

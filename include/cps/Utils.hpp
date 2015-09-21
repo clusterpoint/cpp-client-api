@@ -5,8 +5,6 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-
 namespace CPS
 {
 class Error
@@ -18,25 +16,25 @@ public:
     }
 
     /** Error code */
-    string code;
+    std::string code;
     /** Error text */
-    string text;
+    std::string text;
     /** Error message */
-    string message;
+    std::string message;
     /** Error severity */
-    string level;
+    std::string level;
     /** Error source */
-    string source;
+    std::string source;
     /** Document ids affected */
-    vector<string> documentIds;
+    std::vector<std::string> documentIds;
 };
 
 namespace Utils
 {
-inline string &str_replace(const string &needle, const string &replace,
-                    string &haystack)
+inline std::string &str_replace(const std::string &needle, const std::string &replace,
+                    std::string &haystack)
 {
-    string oldstack = haystack;
+    std::string oldstack = haystack;
     size_t nlen = needle.length(), pos = 0;
 
     do {
@@ -51,11 +49,11 @@ inline string &str_replace(const string &needle, const string &replace,
 
 /**
  * Replace ', &, ", < and > characters with their XML entities
- * @param text string to escape
+ * @param text std::string to escape
  */
-inline string xmlspecialchars(const string &text)
+inline std::string xmlspecialchars(const std::string &text)
 {
-    string ret = text;
+    std::string ret = text;
     str_replace("&", "&amp;", ret);
     str_replace("\"", "&quot;", ret);
     str_replace("'", "&apos;", ret);
@@ -71,10 +69,10 @@ inline string xmlspecialchars(const string &text)
  * @param limit maximum number of splits to return
  * @param returnEmpty should empty splits be returned
  */
-inline vector<string> explode(const string &delimiter, const string &data,
+inline std::vector<std::string> explode(const std::string &delimiter, const std::string &data,
                        const int limit = 0, const bool returnEmpty = true)
 {
-    vector<string> ret;
+	std::vector<std::string> ret;
     size_t p1 = 0, p2 = 0;
 
     ret.clear();
@@ -109,9 +107,9 @@ inline vector<string> explode(const string &delimiter, const string &data,
  * @param strings vector of strings to join together
  * @param delim delimiter to use when joining (default = ", ")
  */
-inline string join(const vector <string> &strings, const string &delim = ", ") {
-    string ret;
-    for (vector <string>::const_iterator it = strings.begin(); it != strings.end(); ++it) {
+inline std::string join(const std::vector<std::string> &strings, const std::string &delim = ", ") {
+	std::string ret;
+    for (std::vector <std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it) {
         if (it != strings.begin()) ret += delim;
         ret += *it;
     }
@@ -123,7 +121,7 @@ inline string join(const vector <string> &strings, const string &delim = ", ") {
  * @param input string to trim
  * @param chars characters to trim default are space, tab and new line symbols
  */
-inline string &trim(string &input, const string &chars = " \t\n\r")
+inline std::string &trim(std::string &input, const std::string &chars = " \t\n\r")
 {
     size_t first = input.find_first_not_of(chars);
     if (first == input.npos) { // all chars are bad
@@ -143,9 +141,9 @@ inline string &trim(string &input, const string &chars = " \t\n\r")
  * @param value value to covert to string
  */
 template<class T>
-inline string toString(const T& value)
+inline std::string toString(const T& value)
 {
-    return boost::lexical_cast<string>(value);
+    return boost::lexical_cast<std::string>(value);
 }
 } //namespace Utils
 } //namespace cps

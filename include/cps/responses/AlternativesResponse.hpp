@@ -29,18 +29,18 @@ public:
         /** cr value of the alternative */
         double cr;
         /** Actual word (content) that is alternative */
-        string content;
+        std::string content;
     };
 
     Alternative() {}
     virtual ~Alternative() {}
 
     /** alternative search term */
-    string to;
+    std::string to;
     /** number of times the alternative search term occurs in the Storage */
     int count;
     /** list of alternative words */
-    vector<Word> words;
+    std::vector<Word> words;
 };
 
 class AlternativesResponse: public Response
@@ -52,7 +52,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    AlternativesResponse(string rawResponse) :
+    AlternativesResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~AlternativesResponse() {}
@@ -61,7 +61,7 @@ public:
      * Gets the spelling alternatives to the specified query terms.
      * Returns a map with term as key and an Alternative object as value for each query term
      */
-    map<string, Alternative> getAlternatives() {
+    std::map<std::string, Alternative> getAlternatives() {
         if (!_alternatives.empty())
             return _alternatives;
         _alternatives.clear();
@@ -70,7 +70,7 @@ public:
             Node *el = alternatives[i]->getFirstChild();
             Alternative alt;
             while (el != NULL) {
-                string name = el->getName();
+            	std::string name = el->getName();
                 if (name == "to")
                     alt.to = el->getContent();
                 else if (name == "count")
@@ -92,7 +92,7 @@ public:
     }
 
 private:
-    map<string, Alternative> _alternatives;
+    std::map<std::string, Alternative> _alternatives;
 };
 }
 

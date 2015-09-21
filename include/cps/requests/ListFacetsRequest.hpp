@@ -17,7 +17,7 @@ public:
      * Constructs an instance of the CPSListFacetsRequest class.
      * @param path facet path to list the facet terms from
      */
-    ListFacetsRequest(const string &path) :
+    ListFacetsRequest(const std::string &path) :
         Request("list-facets") {
         setPath(path);
     }
@@ -25,7 +25,7 @@ public:
      * Constructs an instance of the CPSListFacetsRequest class.
      * @param paths an array of paths to list the facet terms from
      */
-    ListFacetsRequest(const vector<string> &paths) :
+    ListFacetsRequest(const std::vector<std::string> &paths) :
         Request("list-facets") {
         setPaths(paths);
     }
@@ -36,15 +36,15 @@ public:
      * Set array of paths for facets for which values will be returned
      * @param path facet path to list the facet terms from
      */
-    void setPath(const string &path) {
-        setPaths(vector < string > (1, path));
+    void setPath(const std::string &path) {
+        setPaths(std::vector<std::string>(1, path));
     }
 
     /**
      * Set array of paths for facets for which values will be returned
      * @param paths facet path to list the facet terms from
      */
-    void setPaths(const vector<string> &paths) {
+    void setPaths(const std::vector<std::string> &paths) {
         setParam("path", paths);
     }
 };

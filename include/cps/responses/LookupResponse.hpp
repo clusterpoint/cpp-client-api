@@ -27,7 +27,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    LookupResponse(string rawResponse) :
+    LookupResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~LookupResponse() {
@@ -48,7 +48,7 @@ public:
      * @param documentTagName string that identifies root of document
      * @param formatted boolean, true if document should be formatted with spaces for better readability
      */
-    vector<string> getDocumentsString(bool formatted = true) {
+    std::vector<std::string> getDocumentsString(bool formatted = true) {
         if (!_documentsString.empty())
             return _documentsString;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/results/" + documentRootXpath, true);
@@ -63,7 +63,7 @@ public:
      * @param documentTagName string that identifies root of document
      * @see XMLDocument
      */
-    vector<XMLDocument*> getDocumentsXML() {
+    std::vector<XMLDocument*> getDocumentsXML() {
         if (!_documentsXML.empty())
             return _documentsXML;
         NodeSet ns = doc->FindFast("cps:reply/cps:content/results/" + documentRootXpath, true);
@@ -74,8 +74,8 @@ public:
     }
 
 private:
-    vector<string> _documentsString;
-    vector<XMLDocument*> _documentsXML;
+    std::vector<std::string> _documentsString;
+    std::vector<XMLDocument*> _documentsXML;
 };
 }
 

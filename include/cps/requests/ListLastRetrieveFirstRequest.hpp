@@ -20,8 +20,8 @@ public:
      * @param docs maximum number of documents to return
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    ListLastRetrieveFirstRequest(const string &command, int offset = 0, int docs = 10,
-                                 const map<string, string> &list = Request::MapStringStringType()) :
+    ListLastRetrieveFirstRequest(const std::string &command, int offset = 0, int docs = 10,
+                                 const std::map<std::string, std::string> &list = Request::MapStringStringType()) :
         Request(command) {
         if (offset != 0)
             setOffset(offset);
@@ -53,9 +53,9 @@ public:
      * Defines which tags of the search results should be listed in the response
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    void setList(const map<string, string> &list) {
-        string listString = "";
-        for (map<string, string>::const_iterator it = list.begin();
+    void setList(const std::map<std::string, std::string> &list) {
+    	std::string listString = "";
+        for (std::map<std::string, std::string>::const_iterator it = list.begin();
                 it != list.end(); ++it) {
             listString += Request::Term(it->second, it->first);
         }
@@ -72,7 +72,7 @@ public:
      * @param docs maximum number of documents to return
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    ListLastRequest(int offset = 0, int docs = 10, const map<string, string> &list = Request::MapStringStringType()) :
+    ListLastRequest(int offset = 0, int docs = 10, const std::map<std::string, std::string> &list = Request::MapStringStringType()) :
         ListLastRetrieveFirstRequest("list-last", offset, docs, list) {
     }
     virtual ~ListLastRequest() {
@@ -88,7 +88,7 @@ public:
      * @param docs maximum number of documents to return
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    ListFirstRequest(int offset = 0, int docs = 10, const map<string, string> &list = Request::MapStringStringType()) :
+    ListFirstRequest(int offset = 0, int docs = 10, const std::map<std::string, std::string> &list = Request::MapStringStringType()) :
         ListLastRetrieveFirstRequest("list-first", offset, docs, list) {
     }
     virtual ~ListFirstRequest() {

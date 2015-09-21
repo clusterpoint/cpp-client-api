@@ -21,7 +21,7 @@ public:
      * @param query an optional query that all found documents have to match against
      */
     SimilarRequest(int len, int quota, int offset = 0, int docs = 10,
-                   const string &query = "") :
+                   const std::string &query = "") :
         Request("similar") {
         setParam("len", Utils::toString(len));
         setParam("quota", Utils::toString(quota));
@@ -38,21 +38,21 @@ public:
     /**
      * Defines query that all found documents have to match against
      */
-    void setQuery(const string &query) {
+    void setQuery(const std::string &query) {
         this->setParam("query", query);
     }
 
     /**
      * Defines query that all found documents have to match against
      */
-    void setId(const string &id) {
+    void setId(const std::string &id) {
         this->setParam("id", id);
     }
 
     /**
      * Defines query that all found documents have to match against
      */
-    void setText(const string &text) {
+    void setText(const std::string &text) {
         this->setParam("text", text);
     }
 };
@@ -68,8 +68,8 @@ public:
      * @param docs number of documents to retrieve
      * @param query an optional query that all found documents have to match against
      */
-    SimilarDocumentRequest(const string &id, int len, int quota, int offset = 0,
-                           int docs = 10, const string &query = "") :
+    SimilarDocumentRequest(const std::string &id, int len, int quota, int offset = 0,
+                           int docs = 10, const std::string &query = "") :
         SimilarRequest(len, quota, offset, docs, query) {
         setId(id);
 
@@ -89,8 +89,8 @@ public:
      * @param docs number of documents to retrieve
      * @param query an optional query that all found documents have to match against
      */
-    SimilarTextRequest(const string &text, int len, int quota, int offset = 0,
-                       int docs = 10, const string &query = "") :
+    SimilarTextRequest(const std::string &text, int len, int quota, int offset = 0,
+                       int docs = 10, const std::string &query = "") :
         SimilarRequest(len, quota, offset, docs, query) {
         setText(text);
     }

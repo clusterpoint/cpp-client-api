@@ -19,7 +19,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    ListWordsResponse(string rawResponse) :
+    ListWordsResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~ListWordsResponse() {
@@ -29,17 +29,17 @@ public:
      * Returns words matching the given wildcard.
      * Return map with key as a word wildcard and value as matching word and count of this matching word found
      */
-    map<string, map<string, int> > getWords() {
+    std::map<std::string, std::map<std::string, int> > getWords() {
         if (!_words.empty())
             return _words;
         _words.clear();
         NodeSet ns = doc->FindFast("cps:reply/cps:content/list", true);
         for (unsigned int i = 0; i < ns.size(); i++) {
-            string to = ns[i]->getAttribute("to")->getValue();
+        	std::string to = ns[i]->getAttribute("to")->getValue();
             Node* el = ns[i]->getFirstChild();
             while (el != NULL) {
                 int count = atoi(el->getAttribute("count")->getContentPtr());
-                string word = el->getContent();
+                std::string word = el->getContent();
                 _words[to][word] = count;
                 el = el->getNextSibling();
             }
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    map<string, map<string, int> > _words;
+    std::map<std::string, std::map<std::string, int> > _words;
 };
 }
 

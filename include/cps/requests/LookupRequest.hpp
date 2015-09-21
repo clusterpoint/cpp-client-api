@@ -17,8 +17,8 @@ public:
      * @param id document id to be looked up
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    LookupRequest(const string &id,
-                  const map<string, string> &list = Request::MapStringStringType()) :
+    LookupRequest(const std::string &id,
+                  const std::map<std::string, std::string> &list = Request::MapStringStringType()) :
         Request("lookup") {
         setId(id);
         if (!list.empty())
@@ -28,7 +28,7 @@ public:
      * @param ids array of document ids to be looked up
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    LookupRequest(const vector<string> &ids, const map<string, string> &list =
+    LookupRequest(const std::vector<std::string> &ids, const std::map<std::string, std::string> &list =
     			Request::MapStringStringType()) :
         Request("lookup") {
         setIds(ids);
@@ -42,9 +42,9 @@ public:
      * Defines which tags of the search results should be listed in the response
      * @param list map where key is xpath and value contains listing options (yes, no, snippet or highlight)
      */
-    void setList(const map<string, string> &list) {
-        string listString = "";
-        for (map<string, string>::const_iterator it = list.begin();
+    void setList(const std::map<std::string, std::string> &list) {
+    	std::string listString = "";
+        for (std::map<std::string, std::string>::const_iterator it = list.begin();
                 it != list.end(); ++it) {
             listString += Request::Term(it->second, it->first);
         }
@@ -55,7 +55,7 @@ public:
      * Set document ids to be looked up
      * @param id document id to be looked up
      */
-    void setId(const string &id) {
+    void setId(const std::string &id) {
         documentsWithUserId[id] = "";
     }
 
@@ -63,7 +63,7 @@ public:
      * Set document ids to be looked up
      * @param ids array of document ids to be looked up
      */
-    void setIds(const vector<string> &ids) {
+    void setIds(const std::vector<std::string> &ids) {
         for (unsigned int i = 0; i < ids.size(); i++) {
             documentsWithUserId[ids[i]] = "";
         }

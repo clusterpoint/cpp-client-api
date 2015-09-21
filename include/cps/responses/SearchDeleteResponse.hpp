@@ -19,7 +19,7 @@ public:
      * so no default constructor is provided
      * @param rawResponse string of raw response from CPS server. This should be valid XML
      */
-    SearchDeleteResponse(string rawResponse) :
+    SearchDeleteResponse(std::string rawResponse) :
         Response(rawResponse) {
     }
     virtual ~SearchDeleteResponse() {
