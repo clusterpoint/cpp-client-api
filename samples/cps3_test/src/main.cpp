@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         ("user,u", po::value<std::string>(), "User name")
         ("password,p", po::value<std::string>(), "User password");
     po::variables_map vm;
-    std::vector<string> additionalParameters;
+    std::vector<std::string> additionalParameters;
     po::parsed_options parsed = po::command_line_parser(argc, argv).
         options(desc).allow_unregistered().run();
     po::store(parsed, vm);
