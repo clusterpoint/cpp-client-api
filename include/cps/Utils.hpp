@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 namespace CPS
 {
@@ -31,22 +32,6 @@ public:
 
 namespace Utils
 {
-inline std::string &str_replace(const std::string &needle, const std::string &replace,
-                    std::string &haystack)
-{
-    std::string oldstack = haystack;
-    size_t nlen = needle.length(), pos = 0;
-
-    do {
-        oldstack = haystack;
-
-        if ((pos = haystack.find(needle)) != haystack.npos)
-            haystack.replace(pos, nlen, replace);
-    } while (oldstack != haystack);
-
-    return haystack;
-}
-
 /**
  * Replace ', &, ", < and > characters with their XML entities
  * @param text std::string to escape
@@ -54,11 +39,11 @@ inline std::string &str_replace(const std::string &needle, const std::string &re
 inline std::string xmlspecialchars(const std::string &text)
 {
     std::string ret = text;
-    str_replace("&", "&amp;", ret);
-    str_replace("\"", "&quot;", ret);
-    str_replace("'", "&apos;", ret);
-    str_replace("<", "&lt;", ret);
-    str_replace(">", "&gt;", ret);
+    boost::replace_all(ret, "&", "&amp;");
+    boost::replace_all(ret, "\"", "&quot;");
+    boost::replace_all(ret, "'", "&apos;");
+    boost::replace_all(ret, "<", "&lt;");
+    boost::replace_all(ret, ">", "&gt;");
     return ret;
 }
 
